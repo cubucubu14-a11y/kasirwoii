@@ -27,8 +27,13 @@ jobs:
     - name: Build Debug APK
       run: gradle assembleDebug
 
+    # TAMBAHAN BARU: RENAME FILE APK
+    - name: Rename APK
+      run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/Kasir-Woii.apk
+
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Kasir-Woii-APK
-        path: app/build/outputs/apk/debug/app-debug.apk
+        # Path diubah ke nama yang baru
+        path: app/build/outputs/apk/debug/Kasir-Woii.apk
