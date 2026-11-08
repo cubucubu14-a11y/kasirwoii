@@ -19,6 +19,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    # 1. MEMBUAT KEYSTORE OTOMATIS
+    - name: Generate Keystore
+      run: |
+        keytool -genkey -v -keystore app/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
       with:
@@ -27,7 +32,7 @@ jobs:
     - name: Build Debug APK
       run: gradle assembleDebug
 
-    # TAMBAHAN BARU: RENAME FILE APK
+    # 2. RENAME FILE APK
     - name: Rename APK
       run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/Kasir-Woii.apk
 
@@ -35,5 +40,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Kasir-Woii-APK
-        # Path diubah ke nama yang baru
         path: app/build/outputs/apk/debug/Kasir-Woii.apk
+
+    # 3. HAPUS KEYSTORE AGAR TIDAK BOCOR
+    - name: Clean up Keystore
+      run: rm app/debug.keystore
