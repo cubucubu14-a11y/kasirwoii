@@ -11,8 +11,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
-
-        // Tampilkan Kasir pertama kali
         loadFragment(KasirFragment())
 
         bottomNav.setOnItemSelectedListener { item ->
