@@ -23,16 +23,30 @@ class PenjualanFragment : Fragment() {
         val progress = view.findViewById<ProgressBar>(R.id.progressBarRiwayat)
         
         rv.layoutManager = LinearLayoutManager(context)
-        progress.visibility = View.VISIBLE
+        
+        // Cek apakah URL sudah disetel
+        val sharedPref = requireContext().getSharedPreferences("KasirWoiiPrefs", android.content.Context.MODE_PRIVATE)
+        val urlTersimpan = sharedPref.getString("URL_APPS_SCRIPT", "") ?: ""
 
-        ApiClient.getRiwayat { json ->
-            activity?.runOnUiThread {
-                progress.visibility = View.GONE
-                if (json != null) {
-                    try {
-                        val res = Gson().fromJson(json, RiwayatResponse::class.java)
-                        rv.adapter = RiwayatAdapter(res.data)
-                    } catch (e: Exception) { Toast.makeText(context, "Gagal baca riwayat", Toast.LENGTH_SHORT).show() }
+        if (urlTersimpan.isEmpty()) {
+            Toast.makeText(context, "Harap isi URL Apps Script di menu Pengaturan!", Toast.LENGTH_LONG).show()
+            progress.visibility = View.GONE
+        } else {
+            // Ambil Riwayat dari Spreadsheet (Kirim requireContext())
+            progress.visibility = View.VISIBLE
+            ApiClient.getRiwayat(requireContext()) { json ->
+                activity?.runOnUiThread {
+                    progress.visibility = View.GONE
+                    if (json != null) {
+                        try {
+                            val res = Gson().fromJson(json, RiwayatResponse::class.java)
+                            rv.adapter = RiwayatAdapter(res.data)
+                        } catch (e: Exception) { 
+                            Toast.makeText(context, "Gagal baca riwayat", Toast.LENGTH_SHORT).show() 
+                        }
+                    } else {
+                        Toast.makeText(context, "Gagal koneksi ke Internet", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
