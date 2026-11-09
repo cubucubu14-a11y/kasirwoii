@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_kasir"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Kasir" />
+    <item
+        android:id="@+id/nav_penjualan"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Penjualan" />
+    <item
+        android:id="@+id/nav_pengaturan"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Pengaturan" />
+</menu>
