@@ -25,7 +25,10 @@ class MenuAdapter(
 
     override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         val menu = listMenu[position]
-        holder.tvEmoji.text = menu.emoji
+        
+        // Karena dari Spreadsheet tidak ada emoji, kita pakai inisial atau ikon default
+        holder.tvEmoji.text = "🍽️" 
+                              
         holder.tvNama.text = menu.nama
         holder.tvHarga.text = "Rp ${String.format("%,d", menu.harga).replace(',', '.')}"
         
