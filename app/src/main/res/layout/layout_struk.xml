@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp" android:background="#FFFFFF">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="KASIR-WOII\nFood Truck" android:textAlignment="center" android:textSize="18sp" android:textStyle="bold" android:textColor="#1E293B" />
+    <TextView android:id="@+id/tvWaktuStruk" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Tanggal" android:textAlignment="center" android:textSize="12sp" android:layout_marginBottom="16dp" />
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#CBD5E1" android:layout_marginBottom="8dp" />
+    <TextView android:id="@+id/tvDetailStruk" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Item 1\nItem 2" android:textSize="14sp" android:layout_marginBottom="8dp" />
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#CBD5E1" android:layout_marginBottom="8dp" />
+    <TextView android:id="@+id/tvTotalStruk" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Total: Rp 0" android:textSize="16sp" android:textStyle="bold" android:textColor="#2563EB" android:layout_marginBottom="8dp"/>
+    <TextView android:id="@+id/tvMetodeStruk" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Metode: Tunai" android:textSize="14sp" />
+    <Button android:id="@+id/btnTutupStruk" android:layout_width="match_parent" android:layout_height="56dp" android:text="Tutup (Transaksi Baru)" android:backgroundTint="#2563EB" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_marginTop="24dp" />
+</LinearLayout>
