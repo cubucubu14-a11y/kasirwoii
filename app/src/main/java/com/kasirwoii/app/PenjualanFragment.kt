@@ -1,5 +1,6 @@
 package com.kasirwoii.app
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 
+data class RiwayatResponse(val status: String, val data: List<RiwayatItem>)
+data class RiwayatItem(val id: String, val tanggal: String, val jam: String, val nominal: Int, val metode: String)
+
 class PenjualanFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_penjualan, container, false)
@@ -21,18 +25,15 @@ class PenjualanFragment : Fragment() {
         
         val rv = view.findViewById<RecyclerView>(R.id.rvRiwayat)
         val progress = view.findViewById<ProgressBar>(R.id.progressBarRiwayat)
-        
         rv.layoutManager = LinearLayoutManager(context)
         
-        // Cek apakah URL sudah disetel
-        val sharedPref = requireContext().getSharedPreferences("KasirWoiiPrefs", android.content.Context.MODE_PRIVATE)
+        val sharedPref = requireContext().getSharedPreferences("KasirWoiiPrefs", Context.MODE_PRIVATE)
         val urlTersimpan = sharedPref.getString("URL_APPS_SCRIPT", "") ?: ""
 
         if (urlTersimpan.isEmpty()) {
-            Toast.makeText(context, "Harap isi URL Apps Script di menu Pengaturan!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Isi URL di Pengaturan!", Toast.LENGTH_LONG).show()
             progress.visibility = View.GONE
         } else {
-            // Ambil Riwayat dari Spreadsheet (Kirim requireContext())
             progress.visibility = View.VISIBLE
             ApiClient.getRiwayat(requireContext()) { json ->
                 activity?.runOnUiThread {
@@ -41,20 +42,10 @@ class PenjualanFragment : Fragment() {
                         try {
                             val res = Gson().fromJson(json, RiwayatResponse::class.java)
                             rv.adapter = RiwayatAdapter(res.data)
-                        } catch (e: Exception) { 
-                            Toast.makeText(context, "Gagal baca riwayat", Toast.LENGTH_SHORT).show() 
-                        }
-                    } else {
-                        Toast.makeText(context, "Gagal koneksi ke Internet", Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) { Toast.makeText(context, "Gagal baca data", Toast.LENGTH_SHORT).show() }
                     }
                 }
             }
         }
     }
 }
-
-data class RiwayatResponse(val status: String, val data: List<RiwayatItem>)
-data class RiwayatItem(
-    val id: String, val tanggal: String, val jam: String,
-    val nominal: Int, val metode: String
-)
