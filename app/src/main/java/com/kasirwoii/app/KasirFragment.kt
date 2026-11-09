@@ -1,5 +1,6 @@
 package com.kasirwoii.app
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 data class ItemKeranjang(val menu: MenuItem, val qty: Int, val catatan: String)
+data class MenuResponse(val status: String, val data: List<MenuItem>)
+data class MenuItem(val id: String, val nama: String, val harga: Int, val kategori: String, val tersedia: Boolean)
 
 class KasirFragment : Fragment() {
     private val listKeranjang = mutableListOf<ItemKeranjang>()
@@ -37,15 +40,13 @@ class KasirFragment : Fragment() {
 
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
-        // Cek apakah URL sudah disetel di Pengaturan
-        val sharedPref = requireContext().getSharedPreferences("KasirWoiiPrefs", android.content.Context.MODE_PRIVATE)
+        val sharedPref = requireContext().getSharedPreferences("KasirWoiiPrefs", Context.MODE_PRIVATE)
         val urlTersimpan = sharedPref.getString("URL_APPS_SCRIPT", "") ?: ""
 
         if (urlTersimpan.isEmpty()) {
-            Toast.makeText(context, "Harap isi URL Apps Script di menu Pengaturan!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Isi URL Apps Script di menu Pengaturan!", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
         } else {
-            // Ambil Menu dari Spreadsheet (Kirim requireContext())
             progressBar.visibility = View.VISIBLE
             ApiClient.getMenu(requireContext()) { jsonResponse ->
                 activity?.runOnUiThread {
@@ -54,12 +55,8 @@ class KasirFragment : Fragment() {
                         try {
                             val responseData = Gson().fromJson(jsonResponse, MenuResponse::class.java)
                             recyclerView.adapter = MenuAdapter(responseData.data) { menu -> tampilkanBottomSheet(menu) }
-                        } catch (e: Exception) { 
-                            Toast.makeText(context, "Gagal baca data menu", Toast.LENGTH_SHORT).show() 
-                        }
-                    } else { 
-                        Toast.makeText(context, "Gagal koneksi ke Internet", Toast.LENGTH_SHORT).show() 
-                    }
+                        } catch (e: Exception) { Toast.makeText(context, "Gagal baca data", Toast.LENGTH_SHORT).show() }
+                    } else { Toast.makeText(context, "Gagal koneksi internet", Toast.LENGTH_SHORT).show() }
                 }
             }
         }
@@ -95,10 +92,7 @@ class KasirFragment : Fragment() {
     private fun updateKeranjangUI() {
         totalTagihan = 0
         var totalItem = 0
-        for (item in listKeranjang) { 
-            totalTagihan += item.menu.harga * item.qty
-            totalItem += item.qty 
-        }
+        for (item in listKeranjang) { totalTagihan += item.menu.harga * item.qty; totalItem += item.qty }
         tvCartCount.text = "$totalItem Item"
         tvCartTotal.text = "Rp ${String.format("%,d", totalTagihan).replace(',', '.')}"
     }
@@ -112,30 +106,19 @@ class KasirFragment : Fragment() {
         val rv = v.findViewById<RecyclerView>(R.id.rvKeranjang)
         rv.layoutManager = LinearLayoutManager(context)
         rv.adapter = KeranjangAdapter(listKeranjang)
-        
         v.findViewById<TextView>(R.id.tvTotalTagihan).text = "Total: Rp ${String.format("%,d", totalTagihan).replace(',', '.')}"
 
         var metode = "Tunai"
         val btnTunai = v.findViewById<Button>(R.id.btnTunai)
         val btnQris = v.findViewById<Button>(R.id.btnQris)
-
-        btnTunai.setOnClickListener { 
-            metode = "Tunai"
-            btnTunai.setBackgroundColor(android.graphics.Color.parseColor("#2563EB"))
-            btnQris.setBackgroundColor(android.graphics.Color.parseColor("#94A3B8"))
-        }
-        btnQris.setOnClickListener { 
-            metode = "QRIS"
-            btnQris.setBackgroundColor(android.graphics.Color.parseColor("#2563EB"))
-            btnTunai.setBackgroundColor(android.graphics.Color.parseColor("#94A3B8"))
-        }
+        
+        btnTunai.setOnClickListener { metode = "Tunai" }
+        btnQris.setOnClickListener { metode = "QRIS" }
 
         val btnKonfirmasi = v.findViewById<Button>(R.id.btnKonfirmasiCetak)
         btnKonfirmasi.setOnClickListener {
             btnKonfirmasi.isEnabled = false
             btnKonfirmasi.text = "Menyimpan..."
-            
-            // Kirim ke Spreadsheet (Kirim requireContext())
             ApiClient.kirimTransaksi(requireContext(), totalTagihan, metode) { sukses ->
                 activity?.runOnUiThread {
                     if (sukses) {
@@ -146,7 +129,7 @@ class KasirFragment : Fragment() {
                     } else {
                         btnKonfirmasi.isEnabled = true
                         btnKonfirmasi.text = "Konfirmasi & Cetak"
-                        Toast.makeText(context, "Gagal simpan ke database", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Gagal simpan", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -161,30 +144,12 @@ class KasirFragment : Fragment() {
         dialog.setCancelable(false)
 
         v.findViewById<TextView>(R.id.tvWaktuStruk).text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
-        
         var detail = ""
-        for (item in listKeranjang) { 
-            detail += "${item.qty}x ${item.menu.nama}"
-            if(item.catatan.isNotEmpty()) detail += " (${item.catatan})"
-            detail += "\n" 
-        }
+        for (item in listKeranjang) { detail += "${item.qty}x ${item.menu.nama}\n" }
         v.findViewById<TextView>(R.id.tvDetailStruk).text = detail
-
         v.findViewById<TextView>(R.id.tvTotalStruk).text = "Total: Rp ${String.format("%,d", total).replace(',', '.')}"
         v.findViewById<TextView>(R.id.tvMetodeStruk).text = "Metode: $metode"
-        
-        v.findViewById<Button>(R.id.btnTutupStruk).setOnClickListener { 
-            dialog.dismiss() 
-        }
+        v.findViewById<Button>(R.id.btnTutupStruk).setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 }
-
-data class MenuResponse(val status: String, val data: List<MenuItem>)
-data class MenuItem(
-    val id: String,
-    val nama: String,
-    val harga: Int,
-    val kategori: String,
-    val tersedia: Boolean
-)
