@@ -13,11 +13,39 @@
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pengaturan" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" />
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Halaman Pengaturan Menu & Printer akan hadir di tahap selanjutnya."
-        android:padding="24dp"
-        android:textAlignment="center"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="URL Web App (Apps Script)"
+            android:textStyle="bold"
+            android:textColor="#1E293B"
+            android:layout_marginBottom="8dp" />
+
+        <!-- HINT DIUBAH MENJADI TEKS BIASA AGAR TIDAK ERROR -->
+        <EditText
+            android:id="@+id/etUrlAppScript"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Masukkan URL Apps Script di sini"
+            android:inputType="textUri"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnSimpanUrl"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Simpan URL"
+            android:backgroundTint="#10B981"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 </LinearLayout>
